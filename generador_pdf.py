@@ -1,27 +1,20 @@
 from fpdf import FPDF
 
 def generar_informe(perfil):
-    # Crear el documento PDF
+    # Crear objeto PDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    
+    # Título
+    pdf.set_font("Arial", size=16)
     pdf.cell(200, 10, txt="Informe Psicopedagógico", ln=True, align='C')
 
-    # Validar y agregar los datos del perfil
-    if "Estilo de Aprendizaje" in perfil:
-        pdf.cell(200, 10, txt=f"Estilo de Aprendizaje: {perfil['Estilo de Aprendizaje']}", ln=True)
-    else:
-        pdf.cell(200, 10, txt="Estilo de Aprendizaje: No disponible", ln=True)
+    # Contenido del informe
+    pdf.set_font("Arial", size=12)
+    for clave, valor in perfil.items():
+        pdf.ln(10)
+        pdf.cell(200, 10, txt=f"{clave}: {valor}", ln=True)
 
-    if "Inteligencia Predominante" in perfil:
-        pdf.cell(200, 10, txt=f"Inteligencia Predominante: {perfil['Inteligencia Predominante']}", ln=True)
-    else:
-        pdf.cell(200, 10, txt="Inteligencia Predominante: No disponible", ln=True)
-
-    if "Personalidad" in perfil:
-        pdf.cell(200, 10, txt=f"Personalidad: {perfil['Personalidad']}", ln=True)
-    else:
-        pdf.cell(200, 10, txt="Personalidad: No disponible", ln=True)
-
-    # Guardar el archivo PDF
+    # Guardar el archivo
     pdf.output("informe_psicopedagogico.pdf")
+    print("Informe PDF generado correctamente.")
