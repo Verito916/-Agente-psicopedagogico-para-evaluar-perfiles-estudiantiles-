@@ -1,0 +1,4 @@
+psicopedagogico/
+├── app.py         # Archivo principal
+├── clasificador.py # Lógica de clasificación
+├── generador_pdf.py # Generación de informes
