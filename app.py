@@ -2,53 +2,54 @@ import streamlit as st
 from clasificador import clasificar_respuestas
 from generador_pdf import generar_informe
 
+# Función para mantener las respuestas en el estado
+def guardar_respuesta(clave, valor):
+    if clave not in st.session_state:
+        st.session_state[clave] = valor
+    else:
+        st.session_state[clave] = valor
+
 # Configuración inicial
-st.set_page_config(page_title="Agente Psicopedagógico", layout="centered")
-
-# Título de la aplicación
 st.title("Agente Psicopedagógico")
-st.write("Responde el cuestionario para obtener tu perfil psicopedagógico.")
+st.write("Completa el siguiente cuestionario para determinar tu perfil psicopedagógico.")
 
-# Formulario de identificación
-with st.form(key="identificacion"):
-    nombre = st.text_input("Nombre:")
-    carrera = st.text_input("Carrera:")
-    nivel = st.selectbox("Nivel Académico:", ["1er semestre", "2do semestre", "3er semestre", "Otro"])
-    submit_id = st.form_submit_button("Siguiente")
+# Preguntas del cuestionario
+preguntas = {
+    "Estilo de Aprendizaje": [
+        "¿Te resulta más fácil aprender mediante gráficos o imágenes?",
+        "¿Prefieres escuchar información en lugar de leerla?",
+        "¿Te gusta aprender haciendo actividades prácticas?"
+    ],
+    "Inteligencias Múltiples": [
+        "¿Disfrutas resolver problemas matemáticos o lógicos?",
+        "¿Te gusta escribir, leer o contar historias?",
+        "¿Te sientes conectado/a con la naturaleza o los animales?"
+    ],
+    "Personalidad": [
+        "¿Prefieres trabajar solo/a en lugar de en equipo?",
+        "¿Tiendes a tomar decisiones basadas en emociones más que en lógica?",
+        "¿Te consideras una persona organizada y metódica?"
+    ],
+}
 
-# Si el usuario ha llenado sus datos, avanza al cuestionario
-if submit_id:
-    st.write(f"¡Hola, {nombre}! Completemos el cuestionario.")
+# Mostrar preguntas y guardar respuestas
+for categoria, lista_preguntas in preguntas.items():
+    st.subheader(categoria)
+    for i, pregunta in enumerate(lista_preguntas):
+        clave = f"{categoria}_{i}"
+        respuesta = st.radio(
+            pregunta,
+            ["Sí", "No"],
+            key=clave,
+            index=0 if clave not in st.session_state else ["Sí", "No"].index(st.session_state[clave]),
+            on_change=guardar_respuesta,
+            args=(clave, st.session_state.get(clave, "Sí")),
+        )
 
-    # Sección de preguntas
-    respuestas = {}
-    respuestas["estilo_aprendizaje"] = {
-        "visual": st.radio("¿Prefieres aprender viendo gráficos o imágenes?", ["Sí", "No"]) == "Sí",
-        "auditivo": st.radio("¿Prefieres escuchar explicaciones o discusiones?", ["Sí", "No"]) == "Sí",
-        "kinestesico": st.radio("¿Prefieres actividades prácticas?", ["Sí", "No"]) == "Sí"
-    }
-
-    respuestas["inteligencias"] = {
-        "lingüística": st.radio("¿Disfrutas escribir o leer?", ["Sí", "No"]) == "Sí",
-        "matemática": st.radio("¿Te gustan los acertijos matemáticos?", ["Sí", "No"]) == "Sí",
-        "espacial": st.radio("¿Disfrutas dibujar o visualizar ideas?", ["Sí", "No"]) == "Sí",
-        "musical": st.radio("¿Te interesa tocar instrumentos?", ["Sí", "No"]) == "Sí"
-    }
-
-    respuestas["personalidad"] = {
-        "introversion": st.radio("¿Prefieres espacios tranquilos?", ["Sí", "No"]) == "Sí",
-        "extroversion": st.radio("¿Disfrutas actividades sociales?", ["Sí", "No"]) == "Sí"
-    }
-
-    respuestas["iq"] = [
-        st.radio("Si 2+2=4, ¿cuánto es 5x2?", ["10", "12", "15"]) == "10",
-        st.radio("Completa la secuencia: 2, 4, 8, ...", ["16", "32", "64"]) == "32"
-    ]
-
-    # Botón para generar informe
-    if st.button("Generar Informe"):
-        resultados = clasificar_respuestas(respuestas)
-        generar_informe(nombre, carrera, nivel, resultados)
-        st.success("Informe generado. Descárgalo abajo.")
-        with open("informe_estudiante.pdf", "rb") as pdf:
-            st.download_button("Descargar Informe", pdf, "informe_estudiante.pdf")
+# Botón para procesar resultados
+if st.button("Generar Informe"):
+    respuestas = {clave: st.session_state[clave] for clave in st.session_state}
+    perfil = clasificar_respuestas(respuestas)
+    generar_informe(perfil)
+    st.success("¡Informe generado con éxito!")
+    st.download_button("Descargar Informe", data=open("informe.pdf", "rb"), file_name="Informe_Psicopedagógico.pdf")
