@@ -6,17 +6,17 @@ from generador_pdf import generar_informe
 if 'respuestas' not in st.session_state:
     st.session_state.respuestas = {}
 
-# Preguntar por los datos iniciales (nivel de estudios, nombre, edad, semestre, carrera, etc.)
+# Título de la aplicación
 st.title("Agente Psicopedagógico")
 
-# Nivel de estudios
+# Nivel de estudios (Primer dato importante)
 if 'nivel_estudios' not in st.session_state.respuestas:
     st.session_state.respuestas['nivel_estudios'] = st.selectbox(
         "¿Cuál es tu nivel de estudios?",
         ["Primaria", "Secundaria", "Universidad", "Posgrado"]
     )
 
-# Pregunta sobre el estilo de aprendizaje
+# Estilo de aprendizaje
 if 'estilo_aprendizaje' not in st.session_state.respuestas:
     st.session_state.respuestas['estilo_aprendizaje'] = {}
     st.session_state.respuestas['estilo_aprendizaje']['visual'] = st.radio(
@@ -29,7 +29,7 @@ if 'estilo_aprendizaje' not in st.session_state.respuestas:
         "¿Prefieres aprender mediante actividades físicas o prácticas?", ["Sí", "No"]
     ) == "Sí"
 
-# Guardar las respuestas al clasificador
+# Botón para clasificar el perfil
 if st.button("Clasificar Perfil"):
     perfil = clasificar_respuestas(st.session_state.respuestas)
     st.write("Perfil clasificado:", perfil)
