@@ -47,11 +47,11 @@ for categoria, lista_preguntas in preguntas.items():
     st.subheader(categoria)
     for i, pregunta in enumerate(lista_preguntas):
         clave = f"{categoria}_{i}"
-        st.session_state[clave] = st.radio(
+        st.radio(
             pregunta,
             ["Sí", "No"],
             index=0 if st.session_state[clave] == "Sí" else 1,
-            key=clave,
+            key=clave,  # Asocia directamente el valor al estado
         )
 
 # Botón para procesar resultados
