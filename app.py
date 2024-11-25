@@ -1,3 +1,5 @@
+from clasificador import clasificar_respuestas
+
 # Clasificación
 perfil = clasificar_respuestas(respuestas)
 
